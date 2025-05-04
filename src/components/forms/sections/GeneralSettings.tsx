@@ -19,13 +19,18 @@ export default function GeneralSettings({ index }: Props) {
         <div className="space-y-4">
             <h3 className="text-lg font-medium">Datos Generales</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input
-                    type="text"
-                    placeholder="Nombre del KPI"
+                <select
                     className="input"
                     value={kpi.kpi}
                     onChange={(e) => handleChange('kpi', e.target.value)}
-                />
+                >
+                    <option value="sellout">sellout</option>
+                    <option value="stock_oh">stock_oh</option>
+                    <option value="stock_tuberia">stock_tuberia</option>
+                    <option value="sellin">sellin</option>
+                    <option value="fillrate">fillrate</option>
+                    <option value="forecast">forecast</option>
+                </select>
                 <input
                     type="text"
                     placeholder="Prefijo del archivo"
