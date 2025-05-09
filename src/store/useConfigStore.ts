@@ -9,6 +9,7 @@ export type KpiConfig = {
     rename_map: Record<string, string>
     separator: string
     encoding: string
+    clean_fields: string[]
 }
 
 type ConfigState = {
@@ -38,7 +39,8 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
                     original_required_columns: [],
                     rename_map: {},
                     separator: ',',        // default por KPI
-                    encoding: 'utf-8'      // default por KPI
+                    encoding: 'utf-8',      // default por KPI
+                    clean_fields: []
                 }
             ]
         })),

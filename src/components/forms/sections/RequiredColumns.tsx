@@ -1,59 +1,52 @@
 // components/forms/sections/RequiredColumns.tsx
+import React, { useState } from 'react'
 import { useConfigStore } from '../../../store/useConfigStore'
-import React from 'react'
-import { useState } from 'react'
+import FileColumnExtractor from '../../FileColumnExtractor'
 
-type Props = {
+interface Props {
     index: number
 }
 
 export default function RequiredColumns({ index }: Props) {
-    const kpi = useConfigStore((state) => state.kpis[index])
-    const updateKpi = useConfigStore((state) => state.updateKpi)
+    const { kpis, updateKpi } = useConfigStore()
+    const selected = kpis[index]
+    const [availableColumns, setAvailableColumns] = useState<string[]>([])
 
-    const [newColumn, setNewColumn] = useState('')
-
-    const addColumn = () => {
-        if (newColumn.trim() === '') return
-        const updated = [...kpi.original_required_columns, newColumn.trim()]
-        updateKpi(index, { original_required_columns: updated })
-        setNewColumn('')
-    }
-
-    const removeColumn = (i: number) => {
-        const updated = [...kpi.original_required_columns]
-        updated.splice(i, 1)
+    const toggleColumn = (column: string) => {
+        const exists = selected.original_required_columns.includes(column)
+        const updated = exists
+            ? selected.original_required_columns.filter((col) => col !== column)
+            : [...selected.original_required_columns, column]
         updateKpi(index, { original_required_columns: updated })
     }
 
     return (
         <div className="space-y-4">
-            <h3 className="text-lg font-medium">Columnas requeridas</h3>
-            <div className="flex gap-2">
-                <input
-                    type="text"
-                    placeholder="Nombre de la columna"
-                    value={newColumn}
-                    onChange={(e) => setNewColumn(e.target.value)}
-                    className="input"
-                />
-                <button onClick={addColumn} className="btn btn-primary cursor-pointer">
-                    Agregar
-                </button>
-            </div>
-            <ul className="list-disc list-inside space-y-1 pl-4">
-                {kpi.original_required_columns.map((col, i) => (
-                    <li key={i} className="flex justify-between items-center">
-                        <span>{col}</span>
+            <h3 className="text-lg font-semibold text-primary dark:text-secondary-dark">Columnas requeridas</h3>
+            <FileColumnExtractor onExtractColumns={setAvailableColumns} />
+
+            {availableColumns.length === 0 && (
+                <p className="text-sm text-muted">Sube un archivo para ver las columnas disponibles.</p>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+                {availableColumns.map((col) => {
+                    const isSelected = selected.original_required_columns.includes(col)
+                    return (
                         <button
-                            onClick={() => removeColumn(i)}
-                            className="text-red-500 hover:underline text-sm cursor-pointer"
+                            key={col}
+                            onClick={() => toggleColumn(col)}
+                            type="button"
+                            className={`px-3 py-1 text-sm rounded-xl border transition-all ${isSelected
+                                    ? 'bg-btn text-text-dark border-primary'
+                                    : 'bg-background text-foreground border-border hover:bg-accent hover:text-white'
+                                }`}
                         >
-                            Eliminar
+                            {col}
                         </button>
-                    </li>
-                ))}
-            </ul>
+                    )
+                })}
+            </div>
         </div>
     )
 }

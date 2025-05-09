@@ -36,7 +36,7 @@ export default function KpiFormCarousel() {
                 <p className="text-gray-500">No hay KPIs configurados.</p>
                 <button
                     onClick={addKpi}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    className="px-4 py-2 bg-btn text-white rounded hover:bg-btn-dark cursor-pointer"
                 >
                     Agregar KPI
                 </button>
@@ -87,8 +87,8 @@ export default function KpiFormCarousel() {
                     <button
                         onClick={handlePreview}
                         disabled={kpis.length === 0}
-                        className={`mt-4 px-4 py-2 rounded text-white cursor-pointer 
-                            ${kpis.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                        className={`mt-4 px-4 py-2 rounded text-text-dark cursor-pointer 
+                            ${kpis.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-btn hover:bg-btn-dark'}`}
                     >
                         Vista previa JSON
                     </button>
