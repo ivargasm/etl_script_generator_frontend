@@ -32,7 +32,7 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
             kpis: [
                 ...state.kpis,
                 {
-                    kpi: '',
+                    kpi: 'sellout',
                     file_prefix: '',
                     extension: '.xlsx',
                     skiprows: 0,
