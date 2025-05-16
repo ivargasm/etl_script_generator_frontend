@@ -32,7 +32,7 @@ export default function KpiFormCarousel() {
 
     if (kpis.length === 0) {
         return (
-            <div className="space-y-4">
+            <div className="space-y-4 w-full h-dvh md:h-vh flex flex-col items-center justify-center">
                 <p className="text-gray-500">No hay KPIs configurados.</p>
                 <button
                     onClick={addKpi}
