@@ -28,7 +28,7 @@ export default function CleanFields({ index }: Props) {
     return (
         <div className="space-y-4">
             <h3 className="text-lg font-semibold text-primary dark:text-secondary-dark">Campos a limpiar</h3>
-            <div className="flex gap-2">
+            <div className="flex md:gap-2 gap-8">
                 <div className='flex flex-col gap-2'>
                     <label className="block text-sm font-medium text-foreground">
                         Ingresa las calumnas a limpiar (renombradas)
