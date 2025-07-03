@@ -10,6 +10,8 @@ export type KpiConfig = {
     separator: string
     encoding: string
     clean_fields: string[]
+    sheet_name?: string
+    date_format_example?: string
 }
 
 type ConfigState = {
@@ -40,7 +42,9 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
                     rename_map: {},
                     separator: ',',        // default por KPI
                     encoding: 'utf-8',      // default por KPI
-                    clean_fields: []
+                    clean_fields: [],
+                    sheet_name: "",  // default por KPI
+                    date_format_example: "yyyymmdd" // default por KPI
                 }
             ]
         })),

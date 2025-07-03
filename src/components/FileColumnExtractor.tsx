@@ -11,26 +11,45 @@ export default function FileColumnExtractor({ onExtractColumns }: Props) {
     const [selectedSheet, setSelectedSheet] = useState<string | undefined>(undefined)
     const [availableSheets, setAvailableSheets] = useState<string[]>([])
     const [workbook, setWorkbook] = useState<Workbook | null>(null)
+    const [previewRows, setPreviewRows] = useState<string[][]>([])
 
-    const loadSheetColumns = (sheetName: string) => {
-        if (workbook) {
-            const worksheet = workbook.worksheets.find(ws => ws.name === sheetName)
-            if (worksheet) {
-                const headerRow = worksheet.getRow(1)
-                const headers: string[] = []
-                headerRow.eachCell((cell) => {
-                    if (typeof cell.value === 'string') {
-                        headers.push(cell.value)
-                    }
-                })
-                onExtractColumns(headers)
-            }
-        }
+    const loadSheetData = (sheetName: string) => {
+        if (!workbook) return
+        const worksheet = workbook.worksheets.find(ws => ws.name === sheetName)
+        if (!worksheet) return
+
+        const headerRow = worksheet.getRow(1)
+        const headers: string[] = []
+        headerRow.eachCell((cell) => {
+            if (typeof cell.value === 'string') headers.push(cell.value)
+        })
+        onExtractColumns(headers)
+
+        const preview: string[][] = []
+        worksheet.eachRow({ includeEmpty: true }, (row, rowNum) => {
+            if (rowNum > 5) return
+            const valuesArray = Array.isArray(row.values) ? row.values : [];
+            const rowData = valuesArray.slice(1).map((cell: any) => {
+                if (cell instanceof Date) {
+                    return cell.toLocaleDateString('es-MX') // o 'en-GB' para dd/mm/yyyy
+                }
+
+                if (typeof cell === 'object' && cell !== null) {
+                    return cell.text ?? cell.formula ?? cell.result ?? ''
+                }
+
+                return cell?.toString() ?? ''
+            })
+
+            preview.push(rowData)
+        })
+
+        setPreviewRows(preview)
     }
 
     useEffect(() => {
         if (selectedSheet && workbook) {
-            loadSheetColumns(selectedSheet)
+            loadSheetData(selectedSheet)
         }
     }, [selectedSheet, workbook])
 
@@ -46,10 +65,10 @@ export default function FileColumnExtractor({ onExtractColumns }: Props) {
                 header: true,
                 complete: (results) => {
                     onExtractColumns(results.meta.fields || [])
+                    const preview = results.data.slice(0, 5) as any[]
+                    setPreviewRows(preview.map(row => Object.values(row).map(String)))
                 },
-                error: (err) => {
-                    console.error('Error al parsear CSV/TXT:', err.message)
-                },
+                error: (err) => console.error('Error al parsear CSV/TXT:', err.message),
             })
         } else if (fileExt === 'xlsx') {
             const reader = new FileReader()
@@ -60,59 +79,42 @@ export default function FileColumnExtractor({ onExtractColumns }: Props) {
                 const newWorkbook = new Workbook()
                 await newWorkbook.xlsx.load(arrayBuffer as ArrayBuffer)
                 setWorkbook(newWorkbook)
+
                 const sheets = newWorkbook.worksheets.map(ws => ws.name)
                 setAvailableSheets(sheets)
-                
-                if (sheets.length > 1) {
-                    // Si hay múltiples hojas, mostramos el selector
+                if (sheets.length === 1) {
                     setSelectedSheet(sheets[0])
+                    loadSheetData(sheets[0])
                 } else {
-                    // Si hay una sola hoja, extraemos directamente
-                    const worksheet = newWorkbook.worksheets[0]
-                    const headerRow = worksheet.getRow(1)
-                    const headers: string[] = []
-
-                    headerRow.eachCell((cell) => {
-                        if (typeof cell.value === 'string') {
-                            headers.push(cell.value)
-                        }
-                    })
-
-                    onExtractColumns(headers)
+                    setSelectedSheet(sheets[0])
                 }
             }
 
             reader.readAsArrayBuffer(file)
         } else {
-            alert('Formato de archivo no compatible. Usa .csv, .txt o .xlsx')
+            alert('Formato no compatible. Usa .csv, .txt o .xlsx')
         }
     }
 
     return (
-        <div className="space-y-2">
-            <label className="block text-sm font-medium text-foreground">
-                Sube un archivo de ejemplo
-            </label>
+        <div className="space-y-4">
+            <label className="block text-sm font-medium text-foreground">Sube un archivo de ejemplo</label>
             <input
                 type="file"
                 accept=".csv,.txt,.xlsx"
                 onChange={handleFileUpload}
                 className="input"
             />
+
             {fileName && (
                 <div>
                     <p className="text-sm text-muted">Archivo cargado: {fileName}</p>
                     {availableSheets.length > 1 && (
                         <div className="mt-2">
-                            <label className="block text-sm font-medium text-orange-600">
-                                Selecciona la hoja a usar
-                            </label>
+                            <label className="block text-sm font-medium text-orange-600">Selecciona la hoja</label>
                             <select
                                 value={selectedSheet}
-                                onChange={(e) => {
-                                    const sheetName = e.target.value as string
-                                    setSelectedSheet(sheetName)
-                                }}
+                                onChange={(e) => setSelectedSheet(e.target.value)}
                                 className="input"
                             >
                                 {availableSheets.map(sheet => (
@@ -121,6 +123,29 @@ export default function FileColumnExtractor({ onExtractColumns }: Props) {
                             </select>
                         </div>
                     )}
+                </div>
+            )}
+
+            {previewRows.length > 0 && (
+                <div className="overflow-auto border rounded max-h-80">
+                    <table className="w-full text-sm">
+                        <thead className="bg-gray-200 dark:bg-gray-700">
+                            <tr>
+                                {previewRows[0]?.map((_, i) => (
+                                    <th key={i} className="px-2 py-1 border text-left">Col {i + 1}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {previewRows.map((row, i) => (
+                                <tr key={i}>
+                                    {row.map((cell, j) => (
+                                        <td key={j} className="px-2 py-1 border">{cell}</td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             )}
         </div>
