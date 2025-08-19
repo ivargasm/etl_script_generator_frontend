@@ -1,6 +1,9 @@
-import React from 'react'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import React, { useState } from 'react'
+import Editor from 'react-simple-code-editor';
+import { highlight, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-python';
+import 'prismjs/themes/prism-dark.css';
+import './CodeEditor.css';
 
 type Props = {
     code: string
@@ -8,8 +11,11 @@ type Props = {
 }
 
 export default function GeneratedCodeModal({ code, onClose }: Props) {
+    const [editableCode, setEditableCode] = useState(code)
+    const [isEditing, setIsEditing] = useState(false)
+
     const handleDownload = () => {
-        const blob = new Blob([code], { type: 'text/x-python' })
+        const blob = new Blob([editableCode], { type: 'text/x-python' })
         const url = URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
@@ -25,25 +31,77 @@ export default function GeneratedCodeModal({ code, onClose }: Props) {
                     Código Python generado
                 </h2>
 
-                <div className="flex-1 overflow-auto bg-gray-900 text-green-400 p-4 rounded text-sm whitespace-pre-wrap">
-                <SyntaxHighlighter language="python" style={oneDark} wrapLines showLineNumbers>
-                    {code}
-                </SyntaxHighlighter>
+                <div className="flex-1 bg-gray-900 rounded relative overflow-hidden">
+                    {isEditing ? (
+                        <div className="relative w-full h-full">
+                            <div className="absolute inset-0 overflow-auto">
+                                <Editor
+                                    value={editableCode}
+                                    onValueChange={setEditableCode}
+                                    highlight={code => highlight(code, languages.python, 'python')}
+                                    padding={16}
+                                    style={{
+                                        fontFamily: 'Consolas, Monaco, "Courier New", monospace',
+                                        fontSize: 14,
+                                        backgroundColor: '#1a1a1a',
+                                        color: '#f8f8f2',
+                                        minHeight: '100%',
+                                        outline: 'none',
+                                        lineHeight: '1.5'
+                                    }}
+                                    placeholder="Edita tu código Python aquí..."
+                                />
+                            </div>
+                            <div className="absolute top-2 right-2 text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded z-10">
+                                Modo edición
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="h-full overflow-auto p-4">
+                            <pre className="language-python" style={{
+                                margin: 0,
+                                padding: '16px',
+                                backgroundColor: '#1a1a1a',
+                                color: '#f8f8f2',
+                                fontFamily: 'Consolas, Monaco, "Courier New", monospace',
+                                fontSize: '14px',
+                                lineHeight: '1.5',
+                                overflow: 'auto'
+                            }}>
+                                <code dangerouslySetInnerHTML={{
+                                    __html: highlight(editableCode, languages.python, 'python')
+                                }} />
+                            </pre>
+                        </div>
+                    )}
                 </div>
 
-                <div className="mt-4 flex justify-end gap-4">
+                <div className="mt-4 flex justify-between">
                     <button
-                        onClick={onClose}
-                        className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                        onClick={() => setIsEditing(!isEditing)}
+                        className={`px-4 py-2 rounded transition-colors cursor-pointer ${
+                            isEditing
+                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                : 'bg-yellow-600 hover:bg-yellow-700 text-white'
+                        }`}
                     >
-                        Cerrar
+                        {isEditing ? 'Vista previa' : 'Editar código'}
                     </button>
-                    <button
-                        onClick={handleDownload}
-                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                    >
-                        Descargar archivo
-                    </button>
+                    
+                    <div className="flex gap-4">
+                        <button
+                            onClick={onClose}
+                            className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 cursor-pointer"
+                        >
+                            Cerrar
+                        </button>
+                        <button
+                            onClick={handleDownload}
+                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer"
+                        >
+                            Descargar {isEditing ? 'modificado' : 'archivo'}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
