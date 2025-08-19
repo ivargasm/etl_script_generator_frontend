@@ -11,6 +11,14 @@ export default function RequiredColumns({ index }: Props) {
     const { kpis, updateKpi } = useConfigStore()
     const selected = kpis[index]
     const [availableColumns, setAvailableColumns] = useState<string[]>([])
+    
+    const handleHeadersDetected = (hasHeaders: boolean) => {
+        updateKpi(index, { has_headers: hasHeaders })
+    }
+    
+    const handleManualHeadersSet = (headers: string[]) => {
+        updateKpi(index, { manual_headers: headers })
+    }
 
     const toggleColumn = (column: string) => {
         const exists = selected.original_required_columns.includes(column)
@@ -23,7 +31,12 @@ export default function RequiredColumns({ index }: Props) {
     return (
         <div className="space-y-4">
             <h3 className="text-lg font-semibold text-primary dark:text-secondary-dark">Columnas requeridas</h3>
-            <FileColumnExtractor onExtractColumns={setAvailableColumns} />
+            <FileColumnExtractor 
+                onExtractColumns={setAvailableColumns} 
+                hasHeaders={selected.has_headers}
+                onHeadersDetected={handleHeadersDetected}
+                onManualHeadersSet={handleManualHeadersSet}
+            />
 
             {availableColumns.length === 0 && (
                 <p className="text-sm text-muted">Sube un archivo para ver las columnas disponibles.</p>

@@ -15,8 +15,8 @@ export default function JsonPreviewModal({ json, onClose, onCodeGenerated }: Pro
         setError(null)
 
         try {
-            // const response = await fetch('http://localhost:8000/generate/script', {
-                const response = await fetch('https://etl-script-generator-backend.onrender.com/generate/script', {
+            const response = await fetch('http://localhost:8000/generate/script', {
+                // const response = await fetch('https://etl-script-generator-backend.onrender.com/generate/script', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

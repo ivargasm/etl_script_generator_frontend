@@ -12,6 +12,8 @@ export type KpiConfig = {
     clean_fields: string[]
     sheet_name?: string
     date_format_example?: string
+    has_headers: boolean
+    manual_headers: string[]
 }
 
 type ConfigState = {
@@ -44,7 +46,9 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
                     encoding: 'utf-8',      // default por KPI
                     clean_fields: [],
                     sheet_name: "",  // default por KPI
-                    date_format_example: "yyyymmdd" // default por KPI
+                    date_format_example: "yyyymmdd", // default por KPI
+                    has_headers: true,
+                    manual_headers: []
                 }
             ]
         })),
@@ -67,8 +71,12 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
 
     getConfigJson: () => {
         const { kpis, data_type_id } = get()
+        const pythonCompatibleKpis = kpis.map(kpi => ({
+            ...kpi,
+            has_headers: kpi.has_headers ? 'True' : 'False'
+        }))
         return {
-            kpis,
+            kpis: pythonCompatibleKpis,
             data_type_id,
         }
     }
