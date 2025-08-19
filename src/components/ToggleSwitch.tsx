@@ -38,7 +38,7 @@ export const ToggleSwitch: React.FC<Props> = ({ id, checked, onChange, label, cl
                     </div>
                 </label>
             </div>
-            <label htmlFor={id} className="text-sm font-medium cursor-pointer">
+            <label htmlFor={id} className="text-sm font-medium cursor-pointer text-gray-900 dark:text-white">
                 {label}
             </label>
         </div>

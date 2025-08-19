@@ -4,6 +4,7 @@ import { useConfigStore } from '../../store/useConfigStore'
 import KpiForm from './KpiForm'
 import JsonPreviewModal from '../JsonPreviewModal'
 import GeneratedCodeModal from '../GeneratedCodeModal'
+import { AdditionalSettings } from '../AdditionalSettings'
 
 export default function KpiFormCarousel() {
     const { kpis, addKpi, removeKpi, getConfigJson } = useConfigStore()
@@ -46,6 +47,7 @@ export default function KpiFormCarousel() {
 
     return (
         <div className="space-y-6 p-8">
+            <AdditionalSettings />
             <KpiForm index={current} />
 
             <div className="flex justify-between gap-2 flex-wrap">

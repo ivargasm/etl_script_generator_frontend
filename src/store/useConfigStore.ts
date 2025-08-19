@@ -16,20 +16,32 @@ export type KpiConfig = {
     manual_headers: string[]
 }
 
+export type DatabaseConfig = {
+    enabled: boolean
+    aurora: boolean
+    redshift: boolean
+}
+
 type ConfigState = {
     kpis: KpiConfig[]
     data_type_id: string
+    database_config: DatabaseConfig
 
     addKpi: () => void
     updateKpi: (index: number, data: Partial<KpiConfig>) => void
     removeKpi: (index: number) => void
-    updateGlobal: (data: Partial<Omit<ConfigState, 'kpis' | 'addKpi' | 'updateKpi' | 'removeKpi'>>) => void
+    updateGlobal: (data: Partial<Omit<ConfigState, 'kpis' | 'addKpi' | 'updateKpi' | 'removeKpi' | 'getConfigJson'>>) => void
     getConfigJson: () => any
 }
 
 export const useConfigStore = create<ConfigState>((set, get) => ({
     kpis: [],
     data_type_id: '16',
+    database_config: {
+        enabled: false,
+        aurora: false,
+        redshift: false
+    },
 
     addKpi: () =>
         set((state) => ({
@@ -70,14 +82,20 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
     updateGlobal: (data) => set((state) => ({ ...state, ...data })),
 
     getConfigJson: () => {
-        const { kpis, data_type_id } = get()
+        const { kpis, data_type_id, database_config } = get()
         const pythonCompatibleKpis = kpis.map(kpi => ({
             ...kpi,
             has_headers: kpi.has_headers ? 'True' : 'False'
         }))
+        const pythonCompatibleDbConfig = {
+            enabled: database_config.enabled ? 'True' : 'False',
+            aurora: database_config.aurora ? 'True' : 'False',
+            redshift: database_config.redshift ? 'True' : 'False'
+        }
         return {
             kpis: pythonCompatibleKpis,
             data_type_id,
+            database_config: pythonCompatibleDbConfig
         }
     }
 }))
