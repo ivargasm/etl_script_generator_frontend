@@ -44,6 +44,8 @@ export const KpiFormCard: React.FC<Props> = ({ index }) => {
         updateKpi(index, { manual_headers: updated })
     }
 
+
+
     return (
         <div className="bg-white border rounded-xl p-6 space-y-4 shadow-md">
             <div className="flex justify-between items-center">

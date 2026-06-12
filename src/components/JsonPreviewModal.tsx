@@ -70,11 +70,10 @@ export default function JsonPreviewModal({ json, onClose, onCodeGenerated }: Pro
                     <button
                         onClick={handleSend}
                         disabled={loading}
-                        className={`px-4 py-2 text-white rounded ${
-                            loading
+                        className={`px-4 py-2 text-white rounded ${loading
                                 ? 'bg-blue-300 cursor-not-allowed'
                                 : 'bg-blue-600 hover:bg-blue-700'
-                        }`}
+                            }`}
                     >
                         {loading ? 'Generando...' : 'Generar Python'}
                     </button>

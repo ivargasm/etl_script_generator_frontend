@@ -14,6 +14,8 @@ export type KpiConfig = {
     date_format_example?: string
     has_headers: boolean
     manual_headers: string[]
+    extract_date_from_filename: boolean
+    filename_date_regex: string
 }
 
 export type DatabaseConfig = {
@@ -60,7 +62,9 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
                     sheet_name: "",  // default por KPI
                     date_format_example: "yyyymmdd", // default por KPI
                     has_headers: true,
-                    manual_headers: []
+                    manual_headers: [],
+                    extract_date_from_filename: false,
+                    filename_date_regex: "(\\d{8})"
                 }
             ]
         })),
@@ -85,7 +89,8 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
         const { kpis, data_type_id, database_config } = get()
         const pythonCompatibleKpis = kpis.map(kpi => ({
             ...kpi,
-            has_headers: kpi.has_headers ? 'True' : 'False'
+            has_headers: kpi.has_headers ? 'True' : 'False',
+            extract_date_from_filename: kpi.extract_date_from_filename ? 'True' : 'False'
         }))
         const pythonCompatibleDbConfig = {
             enabled: database_config.enabled ? 'True' : 'False',
