@@ -6,6 +6,7 @@ export type KpiConfig = {
     extension: string
     skiprows: number
     original_required_columns: string[]
+    original_optional_columns?: string[]
     rename_map: Record<string, string>
     separator: string
     encoding: string
@@ -55,6 +56,7 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
                     extension: '.xlsx',
                     skiprows: 0,
                     original_required_columns: [],
+                    original_optional_columns: [],
                     rename_map: {},
                     separator: ',',        // default por KPI
                     encoding: 'utf-8',      // default por KPI
@@ -90,7 +92,8 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
         const pythonCompatibleKpis = kpis.map(kpi => ({
             ...kpi,
             has_headers: kpi.has_headers ? 'True' : 'False',
-            extract_date_from_filename: kpi.extract_date_from_filename ? 'True' : 'False'
+            extract_date_from_filename: kpi.extract_date_from_filename ? 'True' : 'False',
+            original_optional_columns: kpi.original_optional_columns || []
         }))
         const pythonCompatibleDbConfig = {
             enabled: database_config.enabled ? 'True' : 'False',

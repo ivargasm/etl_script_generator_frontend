@@ -19,16 +19,21 @@ export default function RenameMap({ index }: Props) {
         })
     }
 
+    const allSelectedColumns = [
+        ...selected.original_required_columns,
+        ...(selected.original_optional_columns || [])
+    ]
+
     return (
         <div className="space-y-4">
             <h3 className="text-lg font-semibold text-primary dark:text-secondary-dark">Renombrar columnas</h3>
             <p className="text-sm text-muted-foreground">
-                Solo se mostrarán las columnas seleccionadas como requeridas.
+                Solo se mostrarán las columnas seleccionadas (requeridas y opcionales).
             </p>
             <div className="grid grid-cols-1 gap-4">
-                {selected.original_required_columns.map((col) => (
+                {allSelectedColumns.map((col) => (
                     <div key={col} className="flex items-center gap-2">
-                        <label className="w-1/3 text-sm font-medium">{col}</label>
+                        <label className="w-1/3 text-sm font-medium truncate" title={col}>{col}</label>
                         <input
                             type="text"
                             className="input"
